@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D2FCC45F2FFD015E00D1514B /* .gitignore in Sources */ = {isa = PBXBuildFile; fileRef = D2FCC45E2FFD015A00D1514B /* .gitignore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		D2FCC44C2FFCFBF800D1514B /* beacon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = beacon.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2FCC45E2FFD015A00D1514B /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -45,6 +50,7 @@
 		D2FCC4432FFCFBF800D1514B = {
 			isa = PBXGroup;
 			children = (
+				D2FCC45E2FFD015A00D1514B /* .gitignore */,
 				D2FCC44E2FFCFBF800D1514B /* beacon */,
 				D2FCC44D2FFCFBF800D1514B /* Products */,
 			);
@@ -132,6 +138,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D2FCC45F2FFD015E00D1514B /* .gitignore in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
