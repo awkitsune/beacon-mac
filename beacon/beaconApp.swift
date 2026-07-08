@@ -24,18 +24,10 @@ struct beaconApp: App {
         MenuBarScene(scheduler: scheduler, container: container)
 
         Window("beacon Preferences", id: "preferences") {
-            PreferencesView()
+            PreferencesView(scheduler: scheduler)
                 .environment(\.modelContext, container.mainContext)
         }
         .defaultSize(width: 640, height: 420)
     }
 
-}
-
-private func symbolName(for state: HealthState) -> String {
-    switch state {
-    case .up: return "server.rack"
-    case .unknown: return "questionmark.circle"
-    case .down: return "exclamationmark.triangle.fill"
-    }
 }

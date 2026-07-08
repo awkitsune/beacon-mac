@@ -15,8 +15,10 @@ enum PreferencesSelection: Hashable {
 }
 
 struct PreferencesView: View {
+    let scheduler: CheckScheduler
+
     @Environment(\.modelContext) private var context
-    @Query(sort: \ServiceConfig.name) private var services: [ServiceConfig]
+    @Query(sort: \ServiceConfig.sortOrder) private var services: [ServiceConfig]
     @State private var selection: PreferencesSelection? = .general
 
     var body: some View {
@@ -34,6 +36,7 @@ struct PreferencesView: View {
                             )
                             .tag(PreferencesSelection.service(service.id))
                         }
+                        .onMove(perform: moveServices)
                     }
                 }
             }
@@ -69,21 +72,6 @@ struct PreferencesView: View {
     }
 
     @ViewBuilder
-    private var sidebarContent: some View {
-        if services.isEmpty {
-            ContentUnavailableView(
-                "No services",
-                systemImage: "server.rack",
-                description: Text("Click + to add one.")
-            )
-        } else {
-            List(services, selection: $selection) { service in
-                Label(service.name, systemImage: icon(for: service.type))
-            }
-        }
-    }
-
-    @ViewBuilder
     private var detailContent: some View {
         switch selection {
         case .general, .none:
@@ -112,11 +100,13 @@ struct PreferencesView: View {
     }
 
     private func addNewService() {
+        let newSortOrder = (services.map(\.sortOrder).max() ?? -1) + 1
         let newService = ServiceConfig(
             name: "New service",
             type: .http,
             interval: 30,
-            config: ["url": ""]
+            config: ["url": ""],
+            sortOrder: newSortOrder
         )
         context.insert(newService)
         try? context.save()
@@ -127,8 +117,18 @@ struct PreferencesView: View {
         guard let id = selectedServiceID,
             let service = services.first(where: { $0.id == id })
         else { return }
+        scheduler.stop(id: id)
         context.delete(service)
         try? context.save()
         selection = .general
+    }
+    
+    private func moveServices(from source: IndexSet, to destination: Int) {
+        var reordered = services
+        reordered.move(fromOffsets: source, toOffset: destination)
+        for (index, service) in reordered.enumerated() {
+            service.sortOrder = index
+        }
+        try? context.save()
     }
 }

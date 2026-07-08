@@ -22,10 +22,18 @@ struct TcpChecker: ServiceChecker {
             )
         }
 
+        guard let nwPort = NWEndpoint.Port(rawValue: port) else {
+            return CheckStatus(
+                state: .unknown,
+                message: "invalid port",
+                lastChecked: Date()
+            )
+        }
+
         return await withCheckedContinuation { continuation in
             let connection = NWConnection(
                 host: NWEndpoint.Host(host),
-                port: NWEndpoint.Port(rawValue: port)!,
+                port: nwPort,
                 using: .tcp
             )
 

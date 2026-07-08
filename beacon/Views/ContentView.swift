@@ -12,7 +12,7 @@ import SwiftUI
 public struct ContentView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.openWindow) private var openWindow
-    @Query private var services: [ServiceConfig]
+    @Query(sort: \ServiceConfig.sortOrder) private var services: [ServiceConfig]
     let scheduler: CheckScheduler
 
     public var body: some View {

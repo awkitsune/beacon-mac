@@ -68,6 +68,14 @@ struct ServiceDetailForm: View {
         draft.buildConfig() != service.config
     }
 
+    private var isValid: Bool {
+        guard draft.interval >= 1 else { return false }
+        if draft.type == .tcp {
+            guard let port = UInt16(draft.port), port > 0 else { return false }
+        }
+        return true
+    }
+
     var body: some View {
         Form {
             Section("Service") {
@@ -124,7 +132,7 @@ struct ServiceDetailForm: View {
                         commit()
                     }
                     .keyboardShortcut(.defaultAction)
-                    .disabled(!isDirty || draft.name.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .disabled(!isDirty || draft.name.trimmingCharacters(in: .whitespaces).isEmpty || !isValid)
                 }
             }
         }

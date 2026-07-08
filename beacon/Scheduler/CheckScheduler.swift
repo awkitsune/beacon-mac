@@ -34,9 +34,7 @@ class CheckScheduler {
 
         // stop and forget anything that no longer exists
         for id in tasks.keys where !currentIDs.contains(id) {
-            tasks[id]?.cancel()
-            tasks.removeValue(forKey: id)
-            statuses.removeValue(forKey: id)
+            stop(id: id)
         }
 
         // start loops for anything new
@@ -45,6 +43,12 @@ class CheckScheduler {
             statuses[service.id] = CheckStatus()
             startLoop(for: service)
         }
+    }
+
+    func stop(id: String) {
+        tasks[id]?.cancel()
+        tasks.removeValue(forKey: id)
+        statuses.removeValue(forKey: id)
     }
     
     func refreshNow(_ service: ServiceConfig) {
@@ -68,12 +72,13 @@ class CheckScheduler {
     
     private func startLoop(for service: ServiceConfig) {
         let id = service.id
-        let interval = service.interval
 
         let task = Task {
             while !Task.isCancelled {
                 let result = await CheckerFactory.run(service)
+                guard !Task.isCancelled else { break }
                 statuses[id] = result
+                let interval = max(service.interval, 1)
                 try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
             }
         }

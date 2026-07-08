@@ -17,6 +17,12 @@ struct RunnersResponse: Codable {
 }
 
 struct GitHubRunnerChecker: ServiceChecker {
+    private func pathComponent(_ value: String) -> String {
+        var allowed = CharacterSet.urlPathAllowed
+        allowed.remove(charactersIn: "/")
+        return value.addingPercentEncoding(withAllowedCharacters: allowed) ?? value
+    }
+
     func check(_ service: ServiceSnapshot) async -> CheckStatus {
         let scope = service.config["scope"] ?? "repo"
 
@@ -28,12 +34,12 @@ struct GitHubRunnerChecker: ServiceChecker {
         let urlString: String
         switch scope {
         case "org":
-            urlString = "https://api.github.com/orgs/\(owner)/actions/runners"
+            urlString = "https://api.github.com/orgs/\(pathComponent(owner))/actions/runners"
         default:
             guard let repo = service.config["repo"] else {
                 return CheckStatus(state: .unknown, message: "missing repo for scope=repo", lastChecked: Date())
             }
-            urlString = "https://api.github.com/repos/\(owner)/\(repo)/actions/runners"
+            urlString = "https://api.github.com/repos/\(pathComponent(owner))/\(pathComponent(repo))/actions/runners"
         }
 
         guard let url = URL(string: urlString) else {

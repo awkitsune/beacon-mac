@@ -12,7 +12,7 @@ enum CheckerType: String, Codable, CaseIterable, Sendable {
     case http
     case tcp
     case githubRunner
-//    case script
+    //    case script
 }
 
 @Model
@@ -22,17 +22,20 @@ class ServiceConfig {
     var type: CheckerType
     var interval: Double
     var config: [String: String]
+    var sortOrder: Int
 
     init(
         name: String,
         type: CheckerType,
         interval: Double,
-        config: [String: String]
+        config: [String: String],
+        sortOrder: Int = 0
     ) {
         self.id = UUID().uuidString
         self.name = name
         self.type = type
         self.interval = interval
         self.config = config
+        self.sortOrder = sortOrder
     }
 }
