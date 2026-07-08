@@ -31,10 +31,15 @@ class CheckScheduler {
         statuses.values.filter { $0.state == .up }.count
     }
 
+    func start(_ service: ServiceConfig) {
+        guard tasks[service.id] == nil else { return }
+        statuses[service.id] = CheckStatus()
+        startLoop(for: service)
+    }
+    
     func reconcile(services: [ServiceConfig]) {
         let currentIDs = Set(services.map(\.id))
 
-        // stop and forget anything that no longer exists
         for id in tasks.keys where !currentIDs.contains(id) {
             tasks[id]?.cancel()
             tasks.removeValue(forKey: id)
@@ -42,11 +47,8 @@ class CheckScheduler {
             serviceNames.removeValue(forKey: id)
         }
 
-        // start loops for anything new
         for service in services {
-            guard tasks[service.id] == nil else { continue }
-            statuses[service.id] = CheckStatus()
-            startLoop(for: service)
+            start(service)
         }
     }
 

@@ -12,6 +12,7 @@ import SwiftData
 import UniformTypeIdentifiers
 
 struct GeneralSettingsView: View {
+    let scheduler: CheckScheduler
     let services: [ServiceConfig]
     let context: ModelContext
 
@@ -101,6 +102,7 @@ struct GeneralSettingsView: View {
                 )
                 context.insert(newService)
                 existingByID[snapshot.id] = newService
+                scheduler.start(newService)
                 nextSortOrder += 1
             }
         }

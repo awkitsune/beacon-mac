@@ -24,6 +24,7 @@ struct beaconApp: App {
         UserDefaults.standard.register(defaults: [
             SettingsKeys.showStatusBadge.rawValue: false,
             SettingsKeys.notifyOnDown.rawValue: true,
+            SettingsKeys.seededKey.rawValue: false
         ])
         NotificationManager.requestNotificationPermission()
     }

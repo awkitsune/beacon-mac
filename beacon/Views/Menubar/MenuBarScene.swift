@@ -12,7 +12,8 @@ struct MenuBarScene: Scene {
     let scheduler: CheckScheduler
     let container: ModelContainer
 
-    @AppStorage(SettingsKeys.showStatusBadge.rawValue) private var showStatusBadge = true
+    @AppStorage(SettingsKeys.showStatusBadge.rawValue) private
+        var showStatusBadge = true
 
     var body: some Scene {
         MenuBarExtra {
@@ -25,8 +26,38 @@ struct MenuBarScene: Scene {
                 Text(badgeText)
                     .font(.system(size: 11, weight: .semibold))
             }
+            .task {
+                bootstrap()
+            }
         }
         .menuBarExtraStyle(.window)
+    }
+
+    private func bootstrap() {
+        let context = container.mainContext
+
+        do {
+            if !UserDefaults.standard.bool(forKey: SettingsKeys.seededKey.rawValue) {
+                let example = ServiceConfig(
+                    name: "Example",
+                    type: .http,
+                    interval: 30,
+                    config: ["url": "https://example.com"],
+                    sortOrder: 0
+                )
+                context.insert(example)
+                try context.save()
+                UserDefaults.standard.set(true, forKey: SettingsKeys.seededKey.rawValue)
+            }
+
+            let descriptor = FetchDescriptor<ServiceConfig>(sortBy: [
+                SortDescriptor(\.sortOrder)
+            ])
+            let existing = try context.fetch(descriptor)
+            scheduler.reconcile(services: existing)
+        } catch {
+            print("Bootstrap failed: \(error)")
+        }
     }
 
     private func symbolName(for state: HealthState) -> String {

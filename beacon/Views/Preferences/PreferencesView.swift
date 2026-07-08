@@ -75,13 +75,13 @@ struct PreferencesView: View {
     private var detailContent: some View {
         switch selection {
         case .general, .none:
-            GeneralSettingsView(services: services, context: context)
+            GeneralSettingsView(scheduler: scheduler, services: services, context: context)
         case .service(let id):
             if let service = services.first(where: { $0.id == id }) {
                 ServiceDetailForm(service: service)
                     .id(service.id)
             } else {
-                GeneralSettingsView(services: services, context: context)
+                GeneralSettingsView(scheduler: scheduler, services: services, context: context)
             }
         }
     }
@@ -111,6 +111,7 @@ struct PreferencesView: View {
         context.insert(newService)
         try? context.save()
         selection = .service(newService.id)
+        scheduler.start(newService)
     }
 
     private func deleteSelected() {

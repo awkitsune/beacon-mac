@@ -8,4 +8,5 @@
 enum SettingsKeys: String {
     case notifyOnDown = "notifyOnDown"
     case showStatusBadge = "showStatusBadge"
+    case seededKey = "seededKey"
 }
