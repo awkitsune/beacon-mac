@@ -23,8 +23,13 @@ struct MenuHeaderView: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("beacon")
-                    .font(.system(size: 13, weight: .semibold))
+                Text(
+                    String(
+                        localized: "application.name",
+                        defaultValue: "beacon",
+                    )
+                )
+                .font(.system(size: 13, weight: .semibold))
                 HStack(spacing: 8) {
                     Text(badgeText)
                         .font(.system(size: 10, design: .monospaced))
@@ -50,10 +55,27 @@ struct MenuHeaderView: View {
         parts.append(
             lastUpdated != nil
                 ? Self.timeFormatter.string(from: lastUpdated!)
-                : "Not updated yet"
+                : String(
+                    localized: "message.services-not-updated",
+                    defaultValue: "Not updated yet",
+                )
         )
-        if scheduler.upCount > 0 { parts.append("up:\(scheduler.upCount)") }
-        if scheduler.downCount > 0 { parts.append("down:\(scheduler.downCount)") }
+        if scheduler.upCount > 0 {
+            parts.append(
+                String(
+                    localized: "services.count.up",
+                    defaultValue: "up:\(scheduler.upCount)",
+                )
+            )
+        }
+        if scheduler.downCount > 0 {
+            parts.append(
+                String(
+                    localized: "services.count.down",
+                    defaultValue: "down:\(scheduler.downCount)",
+                )
+            )
+        }
         return parts.joined(separator: "|")
     }
 }

@@ -24,11 +24,22 @@ struct PreferencesView: View {
     var body: some View {
         NavigationSplitView {
             List(selection: $selection) {
-                Label("Preferences", systemImage: "gearshape")
-                    .tag(PreferencesSelection.general)
+                Label(
+                    String(
+                        localized: "preferences.title",
+                        defaultValue: "Preferences",
+                    ),
+                    systemImage: "gearshape"
+                )
+                .tag(PreferencesSelection.general)
 
                 if !services.isEmpty {
-                    Section("Services") {
+                    Section(
+                        String(
+                            localized: "services.title",
+                            defaultValue: "Services",
+                        )
+                    ) {
                         ForEach(services) { service in
                             Label(
                                 service.name,
@@ -51,14 +62,24 @@ struct PreferencesView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
-                .help("Add service")
+                .help(
+                    String(
+                        localized: "labels.buttons.add-service",
+                        defaultValue: "Add service",
+                    )
+                )
 
                 Button(role: .destructive) {
                     deleteSelected()
                 } label: {
                     Image(systemName: "trash")
                 }
-                .help("Delete service")
+                .help(
+                    String(
+                        localized: "labels.buttons.delete-service",
+                        defaultValue: "Delete service",
+                    )
+                )
                 .disabled(selection == nil)
             }
         }
@@ -75,13 +96,21 @@ struct PreferencesView: View {
     private var detailContent: some View {
         switch selection {
         case .general, .none:
-            GeneralSettingsView(scheduler: scheduler, services: services, context: context)
+            GeneralSettingsView(
+                scheduler: scheduler,
+                services: services,
+                context: context
+            )
         case .service(let id):
             if let service = services.first(where: { $0.id == id }) {
                 ServiceDetailForm(service: service)
                     .id(service.id)
             } else {
-                GeneralSettingsView(scheduler: scheduler, services: services, context: context)
+                GeneralSettingsView(
+                    scheduler: scheduler,
+                    services: services,
+                    context: context
+                )
             }
         }
     }
@@ -102,7 +131,10 @@ struct PreferencesView: View {
     private func addNewService() {
         let newSortOrder = (services.map(\.sortOrder).max() ?? -1) + 1
         let newService = ServiceConfig(
-            name: "New service",
+            name: String(
+                localized: "placeholders.untitled-service",
+                defaultValue: "Untitled service",
+            ),
             type: .http,
             interval: 30,
             config: ["url": ""],
@@ -123,7 +155,7 @@ struct PreferencesView: View {
         try? context.save()
         selection = .general
     }
-    
+
     private func moveServices(from source: IndexSet, to destination: Int) {
         var reordered = services
         reordered.move(fromOffsets: source, toOffset: destination)

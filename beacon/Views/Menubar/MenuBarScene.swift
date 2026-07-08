@@ -35,28 +35,21 @@ struct MenuBarScene: Scene {
 
     private func bootstrap() {
         let context = container.mainContext
+        ServiceConfig.seedExampleIfNeeded(in: context)
 
         do {
-            if !UserDefaults.standard.bool(forKey: SettingsKeys.seededKey.rawValue) {
-                let example = ServiceConfig(
-                    name: "Example",
-                    type: .http,
-                    interval: 30,
-                    config: ["url": "https://example.com"],
-                    sortOrder: 0
-                )
-                context.insert(example)
-                try context.save()
-                UserDefaults.standard.set(true, forKey: SettingsKeys.seededKey.rawValue)
-            }
-
             let descriptor = FetchDescriptor<ServiceConfig>(sortBy: [
                 SortDescriptor(\.sortOrder)
             ])
             let existing = try context.fetch(descriptor)
             scheduler.reconcile(services: existing)
         } catch {
-            print("Bootstrap failed: \(error)")
+            print(
+                String(
+                    localized: "message.failed.bootstrap",
+                    defaultValue: "Bootstrap failed: \(error.localizedDescription)",
+                )
+            )
         }
     }
 

@@ -5,8 +5,8 @@
 //  Created by Vladimir Kosickij on 07.07.2026.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 private struct ServiceDraft: Equatable {
     var name: String
@@ -42,7 +42,10 @@ private struct ServiceDraft: Equatable {
         case .tcp:
             return ["host": host, "port": port]
         case .githubRunner:
-            var config = ["scope": scope, "owner": owner, "runnerName": runnerName, "tokenKeychainKey": tokenKeychainKey]
+            var config = [
+                "scope": scope, "owner": owner, "runnerName": runnerName,
+                "tokenKeychainKey": tokenKeychainKey,
+            ]
             if scope == "repo" { config["repo"] = repo }
             return config
         }
@@ -62,10 +65,9 @@ struct ServiceDetailForm: View {
     }
 
     private var isDirty: Bool {
-        draft.name != service.name ||
-        draft.type != service.type ||
-        draft.interval != service.interval ||
-        draft.buildConfig() != service.config
+        draft.name != service.name || draft.type != service.type
+            || draft.interval != service.interval
+            || draft.buildConfig() != service.config
     }
 
     private var isValid: Bool {
@@ -78,80 +80,248 @@ struct ServiceDetailForm: View {
 
     var body: some View {
         Form {
-            Section("Service") {
-                TextField("Name", text: $draft.name)
-                Picker("Type", selection: $draft.type) {
-                    Text("HTTP").tag(CheckerType.http)
-                    Text("TCP port").tag(CheckerType.tcp)
-                    Text("GitHub runner").tag(CheckerType.githubRunner)
+            Section(
+                String(
+                    localized: "forms.service.title",
+                    defaultValue: "Service",
+                )
+            ) {
+                TextField(
+                    String(
+                        localized: "forms.service.name",
+                        defaultValue: "Name",
+                    ),
+                    text: $draft.name
+                )
+                Picker(
+                    String(
+                        localized: "forms.service.type",
+                        defaultValue: "Type",
+                    ),
+                    selection: $draft.type
+                ) {
+                    Text(
+                        String(
+                            localized: "forms.service.http",
+                            defaultValue: "HTTP",
+                        ),
+                    ).tag(CheckerType.http)
+                    Text(
+                        String(
+                            localized: "forms.service.tcp-port",
+                            defaultValue: "TCP port",
+                        )
+                    ).tag(CheckerType.tcp)
+                    Text(
+                        String(
+                            localized: "forms.service.gh-runner",
+                            defaultValue: "GitHub runner",
+                        )
+                    ).tag(CheckerType.githubRunner)
                 }
                 HStack {
-                    Text("Check every")
+                    Text(
+                        String(
+                            localized: "forms.service.check-every",
+                            defaultValue: "Check every",
+                        )
+                    )
                     TextField("", value: $draft.interval, format: .number)
-                        .frame(width: 60)
-                    Text("seconds")
+                    Text(intervalUnitText)
                 }
             }
 
-            Section("Config") {
+            Section(
+                String(
+                    localized: "forms.service-config.title",
+                    defaultValue: "Config",
+                )
+            ) {
                 switch draft.type {
                 case .http:
-                    TextField("URL", text: $draft.url)
+                    TextField(
+                        String(
+                            localized: "forms.service-config.url",
+                            defaultValue: "URL",
+                        ),
+                        text: $draft.url
+                    )
                 case .tcp:
-                    TextField("Host", text: $draft.host)
-                    TextField("Port", text: $draft.port)
+                    TextField(
+                        String(
+                            localized: "forms.service-config.host",
+                            defaultValue: "Host",
+                        ),
+                        text: $draft.host
+                    )
+                    TextField(
+                        String(
+                            localized: "forms.service-config.port",
+                            defaultValue: "Port",
+                        ),
+                        text: $draft.port
+                    )
                 case .githubRunner:
-                    Picker("Scope", selection: $draft.scope) {
-                        Text("Repository").tag("repo")
-                        Text("Organization").tag("org")
+                    Picker(
+                        String(
+                            localized: "forms.service-config.scope",
+                            defaultValue: "Scope",
+                        ),
+                        selection: $draft.scope
+                    ) {
+                        Text(
+                            String(
+                                localized: "forms.service-config.repo",
+                                defaultValue: "Repository",
+                            )
+                        ).tag("repo")
+                        Text(
+                            String(
+                                localized: "forms.service-config.org",
+                                defaultValue: "Organization",
+                            )
+                        ).tag("org")
                     }
                     .pickerStyle(.segmented)
-                    TextField(draft.scope == "org" ? "Organization" : "Owner (org/user)", text: $draft.owner)
+                    TextField(
+                        draft.scope == "org"
+                            ? String(
+                                localized: "forms.service-config.org",
+                                defaultValue: "Organization",
+                            )
+                            : String(
+                                localized: "forms.service-config.owner",
+                                defaultValue: "Owner (org/user)",
+                            ),
+                        text: $draft.owner
+                    )
                     if draft.scope == "repo" {
-                        TextField("Repo", text: $draft.repo)
+                        TextField(
+                            String(
+                                localized: "forms.service-config.repo",
+                                defaultValue: "Repository",
+                            ),
+                            text: $draft.repo
+                        )
                     }
-                    TextField("Runner name", text: $draft.runnerName)
-                    TextField("Keychain key (label)", text: $draft.tokenKeychainKey)
-                    SecureField("GitHub token", text: $githubToken)
-                    Button("Save token to Keychain") {
+                    TextField(
+                        String(
+                            localized: "forms.service-config.runner-name",
+                            defaultValue: "Runner name",
+                        ),
+                        text: $draft.runnerName
+                    )
+                    TextField(
+                        String(
+                            localized: "forms.service-config.keychain-key",
+                            defaultValue: "Keychain key (label)",
+                        ),
+                        text: $draft.tokenKeychainKey
+                    )
+                    SecureField(
+                        String(
+                            localized: "forms.service-config.gh-token",
+                            defaultValue: "GitHub token",
+                        ),
+                        text: $githubToken
+                    )
+                    Button(
+                        String(
+                            localized: "labels.buttons.save-token-keychain",
+                            defaultValue: "Save token to Keychain",
+                        )
+                    ) {
                         saveToken()
                     }
-                    .disabled(draft.tokenKeychainKey.isEmpty || githubToken.isEmpty)
+                    .disabled(
+                        draft.tokenKeychainKey.isEmpty || githubToken.isEmpty
+                    )
                     githubTokenHelp
                 }
             }
 
             Section {
                 HStack {
-                    Button("Revert") {
+                    Button(
+                        String(
+                            localized: "labels.buttons.revert",
+                            defaultValue: "Revert",
+                        )
+                    ) {
                         draft = ServiceDraft(from: service)
                     }
                     .disabled(!isDirty)
                     Spacer()
-                    Button("Save") {
+                    Button(
+                        String(
+                            localized: "labels.buttons.save",
+                            defaultValue: "Save",
+                        )
+                    ) {
                         commit()
                     }
                     .keyboardShortcut(.defaultAction)
-                    .disabled(!isDirty || draft.name.trimmingCharacters(in: .whitespaces).isEmpty || !isValid)
+                    .disabled(
+                        !isDirty
+                            || draft.name.trimmingCharacters(in: .whitespaces)
+                                .isEmpty
+                            || !isValid
+                    )
                 }
             }
         }
         .formStyle(.grouped)
-        .navigationTitle(service.name.isEmpty ? "Untitled service" : service.name)
+        .navigationTitle(
+            service.name.isEmpty
+                ? String(
+                    localized: "placeholders.untitled-service",
+                    defaultValue: "Untitled service",
+                ) : service.name
+        )
+    }
+
+    private var intervalUnitText: String {
+        let format = String(
+            localized: "forms.service.interval-unit",
+            defaultValue: "%lld seconds"
+        )
+        return String.localizedStringWithFormat(format, Int(draft.interval))
     }
 
     private var githubTokenHelp: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Token setup")
-                .font(.caption.weight(.semibold))
-            Text(draft.scope == "org"
-                 ? "Needs a PAT with admin:org scope (classic) or organization_self_hosted_runners: read (fine-grained)."
-                 : "Needs a PAT with actions: read on this repo.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Text("Paste it above and hit Save — it's written to Keychain under the label you set here, never stored in beacon's own data file.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            Text(
+                String(
+                    localized: "info.token-setup.label",
+                    defaultValue: "Token setup",
+                )
+            )
+            .font(.caption.weight(.semibold))
+            Text(
+                draft.scope == "org"
+                    ? String(
+                        localized: "info.token-setup.org",
+                        defaultValue:
+                            "Needs a Personal access token with admin:org scope (classic) or organization_self_hosted_runners: read (fine-grained).",
+                    )
+                    : String(
+                        localized: "info.token-setup.repo",
+                        defaultValue:
+                            "Needs a Personal access token with actions: read on this repo.",
+                    )
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            Text(
+                String(
+                    localized: "info.token-setup.store-policy",
+                    defaultValue:
+                        "Paste it above and hit Save — it's written to Keychain under the label you set here, never stored in beacon's own data files."
+                )
+
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
         }
         .padding(.top, 4)
     }
@@ -165,7 +335,9 @@ struct ServiceDetailForm: View {
     }
 
     private func saveToken() {
-        guard !draft.tokenKeychainKey.isEmpty, !githubToken.isEmpty else { return }
+        guard !draft.tokenKeychainKey.isEmpty, !githubToken.isEmpty else {
+            return
+        }
         Keychain.write(key: draft.tokenKeychainKey, value: githubToken)
         githubToken = ""
     }

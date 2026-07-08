@@ -7,8 +7,8 @@
 
 import Foundation
 import ServiceManagement
-import SwiftUI
 import SwiftData
+import SwiftUI
 import UniformTypeIdentifiers
 
 struct GeneralSettingsView: View {
@@ -24,40 +24,101 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         Form {
-            Section("Menu Bar") {
-                Toggle("Show up/down counts on icon", isOn: $showStatusBadge)
-                Toggle("Notify when a service goes down", isOn: $notifyOnDown)
+            Section(
+                String(
+                    localized: "preferences.menubar.title",
+                    defaultValue: "Menu Bar",
+                )
+            ) {
+                Toggle(
+                    String(
+                        localized: "preferences.menubar.up-down",
+                        defaultValue: "Show up/down counts on icon",
+                    ),
+                    isOn: $showStatusBadge
+                )
+                Toggle(
+                    String(
+                        localized:
+                            "preferences.menubar.notifications",
+                        defaultValue: "Notify when a service goes down",
+                    ),
+                    isOn: $notifyOnDown
+                )
             }
-            Section("Startup") {
-                Toggle("Launch beacon at login", isOn: $launchAtLogin)
-                    .onChange(of: launchAtLogin) { _, enabled in
-                        do {
-                            if enabled {
-                                try SMAppService.mainApp.register()
-                            } else {
-                                try SMAppService.mainApp.unregister()
-                            }
-                        } catch {
-                            print("Failed to update launch-at-login: \(error)")
+            Section(
+                String(
+                    localized: "preferences.startup.title",
+                    defaultValue: "Startup",
+                )
+            ) {
+                Toggle(
+                    String(
+                        localized:
+                            "preferences.startup.launch-at-login",
+                        defaultValue: "Launch beacon at login",
+                    ),
+                    isOn: $launchAtLogin
+                )
+                .onChange(of: launchAtLogin) { _, enabled in
+                    do {
+                        if enabled {
+                            try SMAppService.mainApp.register()
+                        } else {
+                            try SMAppService.mainApp.unregister()
                         }
+                    } catch {
+                        print(
+                            String(
+                                localized:
+                                    "message.failed.launch-at-login",
+                                defaultValue:
+                                    "Failed to update launch-at-login: \(error.localizedDescription)",
+                            )
+                        )
                     }
+                }
 
             }
-            Section("Configuration") {
+            Section(
+                String(
+                    localized: "preferences.configuration.title",
+                    defaultValue: "Configuration",
+                )
+            ) {
                 HStack(spacing: 8) {
-                    Button("Export Config...") { exportConfig() }
-                    Button("Import Config...") { importConfig() }
+                    Button(
+                        String(
+                            localized: "preferences.configuration.export",
+                            defaultValue: "Export Config...",
+                        )
+                    ) { exportConfig() }
+                    Button(
+                        String(
+                            localized: "preferences.configuration.import",
+                            defaultValue: "Import Config...",
+                        )
+                    ) { importConfig() }
                 }
-                
+
                 Text(
-                    "Exported files don't include Keychain tokens — you'll need to re-add those after importing on a new Mac."
+                    String(
+                        localized: "message.info.configuration-export-keychain",
+                        defaultValue:
+                            "Exported files don't include Keychain tokens — you'll need to re-add those after importing on a new Mac.",
+                    )
                 )
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
-        .navigationTitle("Preferences")
+        .navigationTitle(
+            String(
+                localized: "preferences.title",
+                defaultValue: "Preferences",
+            )
+        )
     }
 
     @MainActor
@@ -78,10 +139,16 @@ struct GeneralSettingsView: View {
         panel.allowedContentTypes = [.json]
         panel.allowsMultipleSelection = false
         guard panel.runModal() == .OK, let url = panel.url,
-              let data = try? Data(contentsOf: url),
-              let snapshots = try? JSONDecoder().decode([ServiceSnapshot].self, from: data) else { return }
+            let data = try? Data(contentsOf: url),
+            let snapshots = try? JSONDecoder().decode(
+                [ServiceSnapshot].self,
+                from: data
+            )
+        else { return }
 
-        var existingByID = Dictionary(uniqueKeysWithValues: services.map { ($0.id, $0) })
+        var existingByID = Dictionary(
+            uniqueKeysWithValues: services.map { ($0.id, $0) }
+        )
         var nextSortOrder = (services.map(\.sortOrder).max() ?? -1) + 1
 
         for snapshot in snapshots {

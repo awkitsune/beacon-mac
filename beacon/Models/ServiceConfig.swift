@@ -38,6 +38,7 @@ class ServiceConfig {
         self.config = config
         self.sortOrder = sortOrder
     }
+
     init(
         id: String,
         name: String,
@@ -52,5 +53,30 @@ class ServiceConfig {
         self.interval = interval
         self.config = config
         self.sortOrder = sortOrder
+    }
+
+    static func seedExampleIfNeeded(in context: ModelContext) {
+        guard
+            !UserDefaults.standard.bool(forKey: SettingsKeys.seededKey.rawValue)
+        else { return }
+
+        let example = ServiceConfig(
+            name: "Example",
+            type: .http,
+            interval: 30,
+            config: ["url": "https://example.com"],
+            sortOrder: 0
+        )
+        context.insert(example)
+
+        do {
+            try context.save()
+            UserDefaults.standard.set(
+                true,
+                forKey: SettingsKeys.seededKey.rawValue
+            )
+        } catch {
+            print("Failed to save seeded services: \(error)")
+        }
     }
 }
