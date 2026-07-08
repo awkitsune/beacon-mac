@@ -622,7 +622,7 @@
       }
     },
     "labels.buttons.reset-data" : {
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
