@@ -12,7 +12,7 @@ struct MenuBarScene: Scene {
     let scheduler: CheckScheduler
     let container: ModelContainer
 
-    @AppStorage("showStatusBadge") private var showStatusBadge = true
+    @AppStorage(SettingsKeys.showStatusBadge.rawValue) private var showStatusBadge = true
 
     var body: some Scene {
         MenuBarExtra {

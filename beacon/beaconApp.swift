@@ -20,6 +20,14 @@ struct beaconApp: App {
 
     @State private var scheduler = CheckScheduler()
 
+    init() {
+        UserDefaults.standard.register(defaults: [
+            SettingsKeys.showStatusBadge.rawValue: false,
+            SettingsKeys.notifyOnDown.rawValue: true,
+        ])
+        NotificationManager.requestNotificationPermission()
+    }
+
     var body: some Scene {
         MenuBarScene(scheduler: scheduler, container: container)
 

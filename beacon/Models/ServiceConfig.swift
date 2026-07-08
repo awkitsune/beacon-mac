@@ -38,4 +38,19 @@ class ServiceConfig {
         self.config = config
         self.sortOrder = sortOrder
     }
+    init(
+        id: String,
+        name: String,
+        type: CheckerType,
+        interval: Double,
+        config: [String: String],
+        sortOrder: Int = 0
+    ) {
+        self.id = id
+        self.name = name
+        self.type = type
+        self.interval = interval
+        self.config = config
+        self.sortOrder = sortOrder
+    }
 }

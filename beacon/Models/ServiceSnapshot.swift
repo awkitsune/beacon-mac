@@ -5,7 +5,7 @@
 //  Created by Vladimir Kosickij on 07.07.2026.
 //
 
-struct ServiceSnapshot: Sendable {
+struct ServiceSnapshot: Sendable, Codable {
     let id: String
     let name: String
     let type: CheckerType
