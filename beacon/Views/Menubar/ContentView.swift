@@ -43,6 +43,7 @@ public struct ContentView: View {
                         }
                     }
                 }
+                .fixedSize(horizontal: false, vertical: true)
                 .frame(maxHeight: 320)
             }
 

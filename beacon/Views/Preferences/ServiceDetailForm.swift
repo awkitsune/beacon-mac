@@ -285,7 +285,12 @@ struct ServiceDetailForm: View {
             localized: "forms.service.interval-unit",
             defaultValue: "%lld seconds"
         )
-        return String.localizedStringWithFormat(format, Int(draft.interval))
+        let formatted = String.localizedStringWithFormat(
+            format,
+            Int(draft.interval)
+        )
+        return formatted.drop { $0.isNumber }
+            .trimmingCharacters(in: .whitespaces)
     }
 
     private var githubTokenHelp: some View {
